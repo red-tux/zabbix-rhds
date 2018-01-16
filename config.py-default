@@ -1,3 +1,4 @@
+# Be sure to rename this file to "config.py"
 username = "cn=Directory Manager"
 password = "password"
 uri = "ldap://server"
