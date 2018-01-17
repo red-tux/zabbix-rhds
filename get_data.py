@@ -3,7 +3,7 @@
 import ldap
 import json
 import pprint
-#import sys
+import sys
 import re
 import datetime
 from dateutil.tz import tzlocal
@@ -19,11 +19,9 @@ def get_ldap_data():
   try:
     l = ldap.initialize(cfg.uri)
     l.protocol_version=ldap.VERSION3
-    l.simple_bind(cfg.username, cfg.password)
-  except ldap.LDAPError, e:
-    print e
+    result=l.simple_bind(cfg.username, cfg.password)
+    l.result(result)  #Flush out errors if there are any
 
-  try:
     ldap_result_id = l.search(cfg.baseDN, cfg.searchScope, cfg.searchFilter, cfg.retrieveAttributes)
     result_set = {}
     while 1:
@@ -42,8 +40,12 @@ def get_ldap_data():
             val.pop('objectClass',None)
             val.pop('cn',None)
             result_set[dn]=val
+  except ldap.INVALID_CREDENTIALS, e:
+    print "Invalid login credentials given"
+    sys.exit(1)
   except ldap.LDAPError, e:
     print e
+    raise
 
   now=datetime.datetime.now(tzlocal())
   result_set["_meta"]={
