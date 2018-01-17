@@ -1,8 +1,12 @@
 import ldap
 
 # Be sure to rename this file to "config.py"
-username = "cn=Directory Manager"
-password = "password"
+
+# The username below is defined in the idm-account.ldif and is used
+# as an example.  Be sure to change the below entries to reflect your
+# configuration.
+username = "uid=zabbix-monitor,cn=sysaccounts,cn=etc,dc=example,dc=com"
+password = "mysecretpassword"
 uri = "ldap://server"
 
 #The following entries configure the ldap search,

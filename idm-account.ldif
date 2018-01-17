@@ -1,0 +1,21 @@
+# NOTE!!
+# Before using the dn suffix "dc=example,dc=com" must be updated to
+# reflect the suffix of your IdM/IPA installation.
+# Also be sure to change the password below.
+
+dn: uid=zabbix-monitor,cn=sysaccounts,cn=etc,dc=example,dc=com
+changetype: add
+objectclass: account
+objectclass: simplesecurityobject
+objectclass: top
+uid: zabbix
+userPassword: mysecretpassword
+passwordExpirationTime: 20380119031407Z
+nsIdleTimeout: 0
+
+dn: cn=config
+changetype: modify
+add: aci
+aci: (target="ldap:///cn=config")(targetattr != "aci")
+     (version 3.0; aci "Allow Zabbix Config Read"; allow(read,search)
+     userdn="ldap:///uid=zabbix-monitor,cn=sysaccounts,cn=etc,dc=example,dc=com";)

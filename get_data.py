@@ -44,6 +44,7 @@ def get_ldap_data():
             result_set[dn]=val
   except ldap.LDAPError, e:
     print e
+
   now=datetime.datetime.now(tzlocal())
   result_set["_meta"]={
     "uri":cfg.uri,
