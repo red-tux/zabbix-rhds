@@ -69,7 +69,7 @@ def show_monitor(initial_val,prev_min_val,current_val):
   prev_min=prev_min_val[dn].copy()
   current=current_val[dn].copy()
 
-  pop_keys=["version","currenttime","starttime","backendmonitordn"]
+  pop_keys=["version","currenttime","starttime","backendmonitordn","connection"]
   for key in pop_keys:
     initial.pop(key,None)
     prev_min.pop(key,None)
