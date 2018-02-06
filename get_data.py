@@ -45,6 +45,7 @@ def get_ldap_dn(connection, baseDN,searchScope,searchFilter,retrieveAttributes):
 def get_ldap_data():
   try:
     l = ldap.initialize(cfg.uri)
+    l.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
     l.protocol_version=ldap.VERSION3
     result=l.simple_bind(cfg.username, cfg.password)
     l.result(result)  #Flush out errors if there are any
