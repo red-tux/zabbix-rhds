@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 
 import time
+from threading import Timer, Thread, Event
 import sys,select
+import os
 
 import get_data
+
+initial_values={}
+prev_min_values={}
+current_values={}
+last_update=time.time()
 
 def print_row(format_str,row,indent=0):
   if indent>0:
@@ -91,10 +98,39 @@ def show_db_monitor(initial_val,prev_min_val,current_val):
     print dn
     show_dn(initial[dn],prev_min[dn],current[dn])
 
+class updateTimer():
+  def __init__(self,t):
+    self.t=t
+    self.thread = Timer(self.t, self.handle_function)
+
+  def handle_function(self):
+    self.update_function()
+    self.thread = Timer(self.t,self.handle_function)
+    self.thread.start()
+
+  def update_function(self):
+    global prev_min_values
+    global current_values
+    global last_update
+
+    last_update=time.time()
+
+    prev_min_values=current_values.copy()
+    current_values=get_data.get_and_group()
+
+  def start(self):
+    self.thread.start()
+
+  def cancel(self):
+    self.thread.cancel()
+
 initial_values=get_data.get_and_group()
 prev_min_values=initial_values
 #time.sleep(5)
 current_values=get_data.get_and_group()
+
+update_thread=updateTimer(60)
+update_thread.start()
 
 #build DN list:
 dn_list = ["cn=monitor","cn=snmp,cn=monitor"]
@@ -104,20 +140,26 @@ for db_dn in sorted(initial_values["cn=monitor"]["backendmonitordn"]):
 
 quit=False
 position=0
+prev_time=0
+update_needed=False
 
 while not quit:
-  print dn_list
   cur_dn=dn_list[position]
-  print cur_dn
-  print position
-  if cur_dn=="cn=monitor":
-    show_monitor(initial_values,prev_min_values,current_values)
-  elif cur_dn=="cn=snmp,cn=monitor":
-    show_snmp(initial_values,prev_min_values,current_values)
-  else:
-    show_dn(initial_values[cur_dn],prev_min_values[cur_dn],current_values[cur_dn])
+  if (prev_time!=last_update) or update_needed:
+    os.system('clear')
+    print dn_list
+    print cur_dn
+    print position
+    if cur_dn=="cn=monitor":
+      show_monitor(initial_values,prev_min_values,current_values)
+    elif cur_dn=="cn=snmp,cn=monitor":
+      show_snmp(initial_values,prev_min_values,current_values)
+    else:
+      show_dn(initial_values[cur_dn],prev_min_values[cur_dn],current_values[cur_dn])
+    prev_time=last_update
+    update_needed=False
 
-  i,o,e = select.select( [sys.stdin], [], [], 60)
+  i,o,e = select.select( [sys.stdin], [], [], 5)
   if (i):
     char = sys.stdin.readline().strip()
     if char=="q":
@@ -126,16 +168,17 @@ while not quit:
       print position
       position=(position+1)%(len(dn_list))
       print position
+      update_needed=True
     elif char=="p":
       print position
       position=position-1
       if position<0:
         position=len(dn_list)-1
       print position
+      update_needed=True
 
-  prev_min_values=current_values
-  current_values=get_data.get_and_group()
-
+print "Exited main loop"
+update_thread.cancel()
 #show_monitor(initial_values,prev_min_values,current_values)
 #show_db_monitor(initial_values,prev_min_values,current_values)
 
