@@ -9,10 +9,17 @@ username = "uid=zabbix-monitor,cn=sysaccounts,cn=etc,dc=example,dc=com"
 password = "mysecretpassword"
 uri = "ldap://server"
 
-#The following entries configure the ldap search,
+#The following dictionary configures the ldap search,
 #in most cases you should not need to alter any of these
 
-baseDN = "cn=config"
-searchScope = ldap.SCOPE_SUBTREE
-retrieveAttributes = None
-searchFilter = "(|(cn=features)(cn=monitor)(cn=snmp)(cn=replication))"
+DNs = {
+"cn=config" : {
+  "searchScope" : ldap.SCOPE_SUBTREE,
+  "retrieveAttributes" : None,
+  "searchFilter" : "(|(cn=features)(cn=monitor)(cn=snmp)(cn=replication))"},
+"cn=monitor" : {
+  "searchScope" : ldap.SCOPE_SUBTREE,
+  "retrieveAttributes" : None,
+  "searchFilter" : "ObjectClass=*"}
+}
+

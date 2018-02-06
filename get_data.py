@@ -15,17 +15,12 @@ import config as cfg
 
 pp = pprint.PrettyPrinter(indent=2)
 
-def get_ldap_data():
+def get_ldap_dn(connection, baseDN,searchScope,searchFilter,retrieveAttributes):
   try:
-    l = ldap.initialize(cfg.uri)
-    l.protocol_version=ldap.VERSION3
-    result=l.simple_bind(cfg.username, cfg.password)
-    l.result(result)  #Flush out errors if there are any
-
-    ldap_result_id = l.search(cfg.baseDN, cfg.searchScope, cfg.searchFilter, cfg.retrieveAttributes)
+    ldap_result_id = connection.search(baseDN, searchScope, searchFilter, retrieveAttributes)
     result_set = {}
     while 1:
-      result_type, result_data = l.result(ldap_result_id,0)
+      result_type, result_data = connection.result(ldap_result_id,0)
       if (result_data == []):
         break
       else:
@@ -47,16 +42,36 @@ def get_ldap_data():
     print e
     raise
 
+  return result_set
+
+def get_ldap_data():
+  try:
+    l = ldap.initialize(cfg.uri)
+    l.protocol_version=ldap.VERSION3
+    result=l.simple_bind(cfg.username, cfg.password)
+    l.result(result)  #Flush out errors if there are any
+
+    result_set = {}
+
+    for dn in cfg.DNs:
+      searchScope=cfg.DNs[dn]["searchScope"]
+      retrieveAttributes=cfg.DNs[dn]["retrieveAttributes"]
+      searchFilter=cfg.DNs[dn]["searchFilter"]
+      result_set.update(get_ldap_dn(l,dn,searchScope,searchFilter,retrieveAttributes))
+  except ldap.INVALID_CREDENTIALS, e:
+    print "Invalid login credentials given"
+    sys.exit(1)
+  except ldap.LDAPError, e:
+    print e
+    raise
+
   now=datetime.datetime.now(tzlocal())
   result_set["_meta"]={
     "uri":cfg.uri,
-    "bindDN":cfg.username,
-    "searchFilter":cfg.searchFilter,
-    "baseDN":cfg.baseDN,
+    "DNs":cfg.DNs,
     "timeStamp":now.strftime("%Y-%m-%d %H:%M:%S %Z")
   }
   return result_set
-
 
 def group_dbordinals(entry):
   #Some entries have ordinal values associated with them, let's group them
