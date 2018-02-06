@@ -10,8 +10,6 @@ from dateutil.tz import tzlocal
 
 import config as cfg
 
-#reload(sys)
-#sys.setdefaultencoding("ISO-8859-1")
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -102,12 +100,11 @@ def group_dbordinals(entry):
     entry["db"]=dbitems
   return entry
 
-result_set=get_ldap_data()
-#print "finished reading"
-#print json.dumps(result_set, indent=1)
-#pp.pprint(result_set)
-#pp.pprint(result_set.keys())
-for k in result_set:
-  result_set[k]=group_dbordinals(result_set[k])
+def get_and_group():
+  result_set=get_ldap_data()
+  for k in result_set:
+    result_set[k]=group_dbordinals(result_set[k])
+  return result_set
 
-print json.dumps(result_set, indent=1)
+if __name__ == "__main__":
+  print json.dumps(get_and_group(), indent=1)
