@@ -9,6 +9,9 @@ username = "uid=zabbix-monitor,cn=sysaccounts,cn=etc,dc=example,dc=com"
 password = "mysecretpassword"
 uri = "ldap://server"
 
+#Set the following to "True" to prevent the verification of the SSL certificate
+NO_TLS_REQCERT = False
+
 #The following dictionary configures the ldap search,
 #in most cases you should not need to alter any of these
 
