@@ -15,7 +15,7 @@ NO_TLS_REQCERT = False
 #The following dictionary configures the ldap search,
 #in most cases you should not need to alter any of these
 
-DNs = {
+ALL_DNs = {
 "cn=config" : {
   "searchScope" : ldap.SCOPE_SUBTREE,
   "retrieveAttributes" : None,
@@ -23,6 +23,21 @@ DNs = {
 "cn=monitor" : {
   "searchScope" : ldap.SCOPE_SUBTREE,
   "retrieveAttributes" : None,
+  "searchFilter" : "ObjectClass=*"},
+"cn=mapping tree, cn=config" : {
+  "searchScope" : ldap.SCOPE_SUBTREE,
+  "retrieveAttributes" : None,
   "searchFilter" : "ObjectClass=*"}
 }
+
+MAP_DNs = {
+"cn=mapping tree, cn=config" : {
+  "searchScope" : ldap.SCOPE_SUBTREE,
+  "retrieveAttributes" : None,
+  "searchFilter" : "ObjectClass=*",
+  "removeItems" : ["nsState","nsDS5ReplicaCredentials"]}
+}
+
+
+DNs = MAP_DNs
 

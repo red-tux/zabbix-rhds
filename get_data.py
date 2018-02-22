@@ -13,26 +13,28 @@ import config as cfg
 
 pp = pprint.PrettyPrinter(indent=2)
 
-def get_ldap_dn(connection, baseDN,searchScope,searchFilter,retrieveAttributes):
+def get_ldap_dn(connection, baseDN,dn_params):
+  searchScope=dn_params["searchScope"]
+  searchFilter=dn_params["searchFilter"]
+  retrieveAttributes=dn_params["retrieveAttributes"]
+  removeItems=dn_params.get("removeItems")
   try:
-    ldap_result_id = connection.search(baseDN, searchScope, searchFilter, retrieveAttributes)
+    ents = connection.search_s(baseDN, searchScope, searchFilter, retrieveAttributes)
     result_set = {}
-    while 1:
-      result_type, result_data = connection.result(ldap_result_id,0)
-      if (result_data == []):
-        break
-      else:
-        if result_type == ldap.RES_SEARCH_ENTRY:
-          #data is returned as a tuple, let's iterate through the tuple, building the hash
-          for dn,val in result_data:
-            #print dn
-            for k,v in val.items():
-              if isinstance(v,list) and len(v)==1:
-                val[k]=v[0]
-            # remove some unneeded entries
-            val.pop('objectClass',None)
-            val.pop('cn',None)
-            result_set[dn]=val
+    for ent in ents:
+      # data is returned as a tuple, 0 is the dn, 1 is the object
+      dn=ent[0]
+      val=ent[1]
+      #print dn
+      for k,v in val.items():
+        if k in removeItems:
+          val.pop(k)
+        elif isinstance(v,list) and len(v)==1:
+          val[k]=v[0]
+      # remove some unneeded entries
+      val.pop('objectClass',None)
+      val.pop('cn',None)
+      result_set[dn]=val
   except ldap.INVALID_CREDENTIALS, e:
     print "Invalid login credentials given"
     sys.exit(1)
@@ -54,10 +56,7 @@ def get_ldap_data():
     result_set = {}
 
     for dn in cfg.DNs:
-      searchScope=cfg.DNs[dn]["searchScope"]
-      retrieveAttributes=cfg.DNs[dn]["retrieveAttributes"]
-      searchFilter=cfg.DNs[dn]["searchFilter"]
-      result_set.update(get_ldap_dn(l,dn,searchScope,searchFilter,retrieveAttributes))
+      result_set.update(get_ldap_dn(l,dn,cfg.DNs[dn]))
   except ldap.INVALID_CREDENTIALS, e:
     print "Invalid login credentials given"
     sys.exit(1)
