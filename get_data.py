@@ -27,7 +27,7 @@ def get_ldap_dn(connection, baseDN,dn_params):
       val=ent[1]
       #print dn
       for k,v in val.items():
-        if k in removeItems:
+        if removeItems and k in removeItems:
           val.pop(k)
         elif isinstance(v,list) and len(v)==1:
           val[k]=v[0]
