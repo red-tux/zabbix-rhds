@@ -104,6 +104,7 @@ ENV/
 
 #include configuration file
 /config.py
+/config.yaml
 
 *.swp
 *.swo

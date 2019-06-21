@@ -1,0 +1,35 @@
+---
+username: cn=Directory Manager
+password: ThisIsMyPasswordIdentifyMe!
+uri: ldap://localhost
+NO_TLS_REQCERT: False
+
+# Subtree scope values
+# 0 BASE
+# 1 ONELEVEL
+# 2 SUBTREE
+# 3 SUBORDINATE
+
+# retrieveAttributes is required for each dn, default is to leave blank.
+
+DNs:
+  cn=config:
+    searchScope: 2
+    retrieveAttributes: 
+    searchFilter: '(|(cn=features)(cn=monitor)(cn=snmp)(cn=replication))'
+  cn=monitor:
+    searchScope: 2
+    retrieveAttributes: 
+    searchFilter: ObjectClass=*
+  cn=mapping tree, cn=config:
+    searchScope: 2
+    retrieveAttributes: 
+    searchFilter: ObjectClass=*
+    removeItems:
+      - nsState
+      - nsDS5ReplicaCredentials
+  "cn=RHDS10_to_RHDS10-2,cn=replica,cn=dc\\3Dlocal,cn=mapping tree,cn=config":
+    searchScope: 2
+    retrieveAttributes: 
+    searchFilter: ObjectClass=*
+        

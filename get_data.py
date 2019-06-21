@@ -1,14 +1,26 @@
 #!/usr/bin/env python
 
+from os import path
 import ldap
 import json
 import pprint
 import sys
 import re
 import datetime
+import yaml
 from dateutil.tz import tzlocal
 
-import config as cfg
+# With the YAML config file, I need to still "fake" the old python based config file
+# just in case it's still in use.
+class Struct:
+  def __init__(self, **entries):
+    self.__dict__.update(entries)
+
+if path.exists("config.yaml"):
+  settings=yaml.load(open("config.yaml"))
+  cfg = Struct(**settings)
+else:
+  import config as cfg
 
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -44,7 +56,7 @@ def get_ldap_dn(connection, baseDN,dn_params):
 
   return result_set
 
-def get_ldap_data():
+def get_ldap_data(dns = cfg.DNs):
   try:
     if cfg.NO_TLS_REQCERT:
       ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
@@ -55,8 +67,8 @@ def get_ldap_data():
 
     result_set = {}
 
-    for dn in cfg.DNs:
-      result_set.update(get_ldap_dn(l,dn,cfg.DNs[dn]))
+    for dn in dns:
+      result_set.update(get_ldap_dn(l,dn,dns[dn]))
   except ldap.INVALID_CREDENTIALS, e:
     print "Invalid login credentials given"
     sys.exit(1)
