@@ -4,11 +4,19 @@ password: ThisIsMyPasswordIdentifyMe!
 uri: ldap://localhost
 NO_TLS_REQCERT: False
 
+# Cache file is only used by 2.4 agent interface
+cache_file: /tmp/2_4_cache.json
+cache_max_age: 60
+
 # Subtree scope values
 # 0 BASE
 # 1 ONELEVEL
 # 2 SUBTREE
 # 3 SUBORDINATE
+
+# List of DNs which are replicated
+replicaDNs:
+  - dc=local
 
 # retrieveAttributes is required for each dn, default is to leave blank.
 
@@ -28,8 +36,5 @@ DNs:
     removeItems:
       - nsState
       - nsDS5ReplicaCredentials
-  "cn=RHDS10_to_RHDS10-2,cn=replica,cn=dc\\3Dlocal,cn=mapping tree,cn=config":
-    searchScope: 2
-    retrieveAttributes: 
-    searchFilter: ObjectClass=*
+
         

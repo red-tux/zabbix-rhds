@@ -26,27 +26,30 @@ else:
 pp = pprint.PrettyPrinter(indent=2)
 
 def get_ldap_dn(connection, baseDN,dn_params):
-  searchScope=dn_params["searchScope"]
+  searchScope=dn_params.get("searchScope",ldap.SCOPE_SUBTREE)
   searchFilter=dn_params["searchFilter"]
-  retrieveAttributes=dn_params["retrieveAttributes"]
+  retrieveAttributes=dn_params.get("retrieveAttributes")
   removeItems=dn_params.get("removeItems")
   try:
-    ents = connection.search_s(baseDN, searchScope, searchFilter, retrieveAttributes)
+    # If we have a single object, build an iterator, otherwise use the iterator
+    iter = (searchFilter,) if not isinstance(searchFilter, (tuple, list)) else searchFilter
     result_set = {}
-    for ent in ents:
-      # data is returned as a tuple, 0 is the dn, 1 is the object
-      dn=ent[0]
-      val=ent[1]
-      #print dn
-      for k,v in val.items():
-        if removeItems and k in removeItems:
-          val.pop(k)
-        elif isinstance(v,list) and len(v)==1:
-          val[k]=v[0]
-      # remove some unneeded entries
-      val.pop('objectClass',None)
-      val.pop('cn',None)
-      result_set[dn]=val
+    for filter in iter:
+      ents = connection.search_s(baseDN, searchScope, filter, retrieveAttributes)
+      for ent in ents:
+        # data is returned as a tuple, 0 is the dn, 1 is the object
+        dn=ent[0]
+        val=ent[1]
+        #print dn
+        for k,v in val.items():
+          if removeItems and k in removeItems:
+            val.pop(k)
+          elif isinstance(v,list) and len(v)==1:
+            val[k]=v[0]
+        # remove some unneeded entries
+        val.pop('objectClass',None)
+        val.pop('cn',None)
+        result_set[dn]=val
   except ldap.INVALID_CREDENTIALS, e:
     print "Invalid login credentials given"
     sys.exit(1)
