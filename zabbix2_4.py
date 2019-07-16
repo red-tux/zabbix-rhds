@@ -74,6 +74,6 @@ elif args.a:
     # print("%s : %s  (%s)" %(key,value,key_map[key]))
     print("%s : %s" %(key,value))
 elif args.c:
-  path=os.path.dirname(os.path.abspath(__file__))
+  path=os.path.abspath(__file__)
   for key in sorted(key_map.keys()):
     print("UserParameter=%s,%s %s" % (key, path, key))
