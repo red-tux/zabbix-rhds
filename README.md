@@ -9,8 +9,10 @@ Red Hat Directory Server monitoring with ldap.
 
 
 ## Requirements
+The following RPMS are required on RHEL
 * python-ldap
 * python-dateutil
+
 
 ## Installation
 To configure the utilities copy the `config.yaml-default` to `config.yaml` and edit with the appropriate information.  Often all you will need to change is the user name to connect with, the password and the url to connect to.
