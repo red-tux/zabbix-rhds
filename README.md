@@ -57,6 +57,10 @@ If you choose to create your own user and ACI for monitoring (recommended) the f
 ## SELinux
 Unfortunately at this time SELinux cannot be set to enforcing with out first creating a custom module on RHEL 7.  It is recommended to either use Permissive mode for now, or to create your own custom SELinux module.
 
+## Sample output
+The following are sample outputs of the LDAP monitoring and Replicaiton monitoring data:
+* [get_data.py](https://gist.github.com/red-tux/34aad1587937e88e88b0f8806edf1639)
+* [get_replication.py](https://gist.github.com/red-tux/630d8d54eddfc104c02ef18dd2deaa88)
 
 ## A special thank you
 I would like to specifically thank Richard Megginson (github: richm) for his intricate work on Replication montoring.  The replication monitoring portions of these scripts were reverse engineered from his efforts.
