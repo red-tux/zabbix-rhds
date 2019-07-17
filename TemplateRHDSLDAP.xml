@@ -2407,7 +2407,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>ldap_replication_discovery</key>
-                    <delay>10m</delay>
+                    <delay>1h</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_contextname/>

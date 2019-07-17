@@ -1,6 +1,9 @@
 # zabbix-rhds
 Red Hat Directory Server monitoirng with Zabbix
 
+# License
+This software is released under the GPL V3 Open Source Licence.
+
 # Support
 This program and related components are not officially supported or maintained by Red Hat.
 
@@ -15,17 +18,41 @@ The following RPMS are required on RHEL
 
 
 ## Installation
-To configure the utilities copy the `config.yaml-default` to `config.yaml` and edit with the appropriate information.  Often all you will need to change is the user name to connect with, the password and the url to connect to.
+### Installing the scripts
+After installing the above required dependencies, copy the .py files to the zabbix user's home directory.  When using the Zabbix SIA RPMs this is /var/lib/zabbix.  You may need to create this directory, if you do ensure it is owned by Zabbix and the SElinux contexts are set appropriately.
 
-To install copy the files `get_data.py`, `get_discovery.py` and `config.yaml` into a directory of your choosing, often the zabbix user home directory (/var/lib/zabbix).
+Next copy the `config.yaml-default` to `config.yaml` in the Zabbix user's home directory and edit with the appropriate information.  Often all you will need to change is the user name to connect with, the password and the url to connect to.
 
-Copy the `userparameter_rhds.conf` file to `/etc/zabbix/zabbix_agentd.d` and ensure that the zabbix agent configuration file references this directory.  If you installed the scripts into a directory other than /var/lib/zabbix you will need to edit this file with the correct path.
+**NOTE:  It is important that the `url` statement be correct on each host being configured to monitor.  Otherwise all hosts may connect to the wrong initial host for data.**
 
-Restart the agent as needed.
+For replication monitoring the user listed in the config file will be used to connect to each host.  Right now there is no way to specify a different username/password for each host.  Replication monitoring requires that the script running on host A be able to connet to each host it has a replication agreement with to check the RUV (Replication Update Vector) on each host to ensure they are in sync.
 
-To test run:
-`zabbix_agentd -t get_data`
-If successful you should see a large chunk of JSON formatted data, if not the error messages should give you a starting point.
+You can test that everything works by executing `get_data.py` or `get_replication.py` from the command line.  It is suggested that you execute the scripts as Zabbix if you are able as each python file will be compiled at execution, in addition this ensures better testing of SELinux and other security frameworkds which may prevent the scripts from properly running.  Upon proper execution you should see a large set of JSON formatted data on screen.  
+
+### Configuring the Zabbix agent
+NOTE: This guide assumes you are using includes for the Zabbix agent configuration, for more information see: https://www.zabbix.com/documentation/4.2/manual/appendix/config/zabbix_agentd
+
+Copy the `userparameter_rhds.conf` file to the `/etc/zabbix/zabbix_agent.d/`.  The file does not need to be owned by Zabbix, but must be readable by it.
+
+To test the userparameter you can execute the following on the command line `zabbix-agentd -t ldap_stats`.  You should see a large set of JSON data on screen similar to what you would see if you executed `get_data.py`
+
+### Configuring Zabbix
+Next import the `Template RHDSLDAP.xml` file into Zabbix and associate to all LDAP servers.
+
+By default replication will auto-discover once an hour.  This can be altered as needed, or run manually (preferable).  However after a replication auto-discovery is run all items will not populate until the next replication data check (key: `ldap_replication`)
+
+## Ldap Permissions
+If you choose to create your own user and ACI for monitoring (recommended) the following DN's are queried for all objectclasses unless otherwise noted:
+* cn=features, cn=config
+* cn=monitor, cn=config
+* cn=snmp, cn=config
+* cn=replication, cn=config
+* cn=monitor
+* cn=mapping tree, cn=config
+  * Full SubTree
+  * objectclasses:
+    * nsDS5ReplicationAgreement
+    * nstombstone
 
 ## SELinux
 Unfortunately at this time SELinux cannot be set to enforcing with out first creating a custom module on RHEL 7.  It is recommended to either use Permissive mode for now, or to create your own custom SELinux module.

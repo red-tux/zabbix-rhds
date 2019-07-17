@@ -4,6 +4,8 @@ password: ThisIsMyPasswordIdentifyMe!
 uri: ldap://localhost
 NO_TLS_REQCERT: False
 
+timeout: 5  # Max time to wait for replication monitoring connections
+
 # Cache file is only used by 2.4 agent interface
 cache_file: /tmp/2_4_cache.json
 cache_max_age: 60
