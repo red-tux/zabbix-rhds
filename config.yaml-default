@@ -38,5 +38,9 @@ DNs:
     removeItems:
       - nsState
       - nsDS5ReplicaCredentials
+  cn=database, cn=monitor, cn=ldbm database, cn=plugins, cn=config:
+    searchScope: 2
+    retrieveAttributes:
+    searchFilter: ObjectClass=*      
 
         

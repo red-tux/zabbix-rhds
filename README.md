@@ -48,6 +48,7 @@ It is recommended that you create your own user and ACI for monitoring the follo
 * cn=snmp, cn=config
 * cn=replication, cn=config
 * cn=monitor
+* cn=database, cn=monitor, cn=ldbm database, cn=plugins, cn=config
 * cn=mapping tree, cn=config
   * Full SubTree
   * objectclasses:
