@@ -39,10 +39,10 @@ To test the userparameter you can execute the following on the command line `zab
 ### Configuring Zabbix
 Next import the `Template RHDSLDAP.xml` file into Zabbix and associate to all LDAP servers.
 
-By default replication will auto-discover once an hour.  This can be altered as needed, or run manually (preferable).  However after a replication auto-discovery is run all items will not populate until the next replication data check (key: `ldap_replication`)
+By default replication will auto-discover once an hour.  This can be altered as needed or run manually.  After the replication auto-discovery is run all items will not populate with data until the next update of the replication data item (key: `ldap_replication`).  The default update time for the replication data item is 5 minutes.
 
 ## LDAP Permissions
-It is recommended that you create your own user and ACI for monitoring (recommended) the following DN's are queried for all objectclasses unless otherwise noted:
+It is recommended that you create your own user and ACI for monitoring the following DN's are queried for all objectclasses unless otherwise noted:
 * cn=features, cn=config
 * cn=monitor, cn=config
 * cn=snmp, cn=config
