@@ -9,7 +9,7 @@ import re
 import datetime
 import yaml
 from dateutil.tz import tzlocal
-from  get_data import get_ldap_data, group_dbordinals
+from  get_data import *
 
 # With the YAML config file, I need to still "fake" the old python based config file
 # just in case it's still in use.
@@ -17,11 +17,8 @@ class Struct:
   def __init__(self, **entries):
     self.__dict__.update(entries)
 
-if path.exists("config.yaml"):
-  settings=yaml.load(open("config.yaml"))
-  cfg = Struct(**settings)
-else:
-  import config as cfg
+settings=yaml.load(open(base_path+"/config.yaml"))
+cfg = Struct(**settings)
 
 def get_discovery():
   result_set={"data":[]}

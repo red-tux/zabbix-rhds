@@ -1,6 +1,8 @@
 import re
 import datetime
 import time
+import json
+import pprint
 
 class CSN(object):
     """CSN is Change Sequence Number
@@ -67,8 +69,14 @@ class CSN(object):
                 retstr = "equal"
         return retstr
 
-    def __repr__(self):
-        return time.strftime("%x %X", time.localtime(self.ts)) + " seq: " + str(self.seq) + " rid: " + str(self.rid)
+    def reprJSON(self):
+      return dict(time= time.strftime("%x %X", time.localtime(self.ts)),
+                  seq= self.seq,
+                  rid= self.rid,
+                  subseq= self.subseq)
 
-    def __str__(self):
-        return self.__repr__()
+    # def __repr__(self):
+    #   return json.dumps(self.__dict__()).encode()
+
+    # def __str__(self):
+    #     return self.__repr__()

@@ -1,7 +1,8 @@
 import re
 import ldap
-from csn import *
+import json
 
+from csn import *
 
 def normalizeDN(dn, usespace=False):
   # not great, but will do until we use a newer version of python-ldap
@@ -46,10 +47,12 @@ class RUV(object):
   ruvpat = r'\{replica\s+(\d+)\s+(.+?)\}\s*(\w*)\s*(\w*)'
   ruvre = re.compile(ruvpat)
 
-  def __init__(self, ent):
+  def __init__(self, ent, limit_to_rid=None):
     # rid is a dict
     # key is replica ID - val is dict of url, min csn, max csn
     self.rid = {}
+    if limit_to_rid:
+      limit_to_rid = int(limit_to_rid)
     for item in ent['nsds50ruv']:
       matchgen = RUV.genre.match(item)
       matchruv = RUV.ruvre.match(item)
@@ -57,7 +60,8 @@ class RUV(object):
         self.gen = CSN(matchgen.group(1))
       elif matchruv:
         rid = int(matchruv.group(1))
-        self.rid[rid] = {'url': matchruv.group(2),
+        if (limit_to_rid is None ) or (not limit_to_rid is None and limit_to_rid==rid):
+          self.rid[rid] = {'url': matchruv.group(2),
                           'min': CSN(matchruv.group(3)),
                           'max': CSN(matchruv.group(4))}
       else:
@@ -66,7 +70,8 @@ class RUV(object):
       matchruv = RUV.ruvre.match(item)
       if matchruv:
         rid = int(matchruv.group(1))
-        self.rid[rid]['lastmod'] = int(matchruv.group(3), 16)
+        if (limit_to_rid is None ) or (not limit_to_rid is None and limit_to_rid==rid):
+          self.rid[rid]['lastmod'] = int(matchruv.group(3), 16)
       else:
         print "unknown nsruvReplicaLastModified item", item
 
@@ -92,11 +97,17 @@ class RUV(object):
   def __eq__(self, oth):
     return cmp(self, oth) == 0
 
-  def __repr__(self):
-    return "gen: %s, rid: %s" % (self.gen.__str__(),self.rid.__str__())
+  def dict(self):
+    return {"gen": self.gen, "rid": self.rid}
   
-  def __str__(self):
-    return self.__repr__()
+  # def __repr__(self):
+  #   print({"gen": self.gen.__str__(),"rid":self.rid.__str__()})
+  #   return json.dumps({"gen": self.gen.__repr__(),"rid":self.rid})
+  def reprJSON(self):
+    return dict(gen= self.gen, rid=self.rid)
+
+  # def __str__(self):
+  #   return self.__repr__()
 
   def getdiffs(self, oth):
     """Compare two ruvs and return the differences

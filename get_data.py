@@ -15,13 +15,9 @@ from dateutil.tz import tzlocal
 class Struct:
   def __init__(self, **entries):
     self.__dict__.update(entries)
-
-if path.exists("config.yaml"):
-  settings=yaml.load(open("config.yaml"))
-  cfg = Struct(**settings)
-else:
-  import config as cfg
-
+base_path=path.dirname(path.abspath(__file__))
+settings=yaml.load(open(base_path+"/config.yaml"))
+cfg = Struct(**settings)
 
 pp = pprint.PrettyPrinter(indent=2)
 
