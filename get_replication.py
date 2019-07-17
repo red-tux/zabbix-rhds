@@ -52,6 +52,8 @@ def parse_nsstate(nsstate):
   state=NSState(nsstate)
   ts=int(state.sampled_time)
   return_val={}
+  # JSON dumps does not like the raw nsstate string.  For now we don't store it
+  # TODO: Fix nsstate storage
   # return_val['raw']=bytearray(nsstate).decode('utf-8')
   return_val['sample_time']=str(datetime.datetime.fromtimestamp(ts))
   return_val['tdiff']=state.tdiff
@@ -68,14 +70,14 @@ def get_replication_data():
   master=connect(cfg.uri, cfg.username, cfg.password)
   result_set = {}
 
+  # Query the LDAP server to find out what replication agreements it has
   replicant_search={"searchScope":ldap.SCOPE_SUBTREE, 
                   "searchFilter":"objectClass=nsDS5ReplicationAgreement",
                   "removeItems": ["nsDS5ReplicaCredentials","nsDS5ReplicaBindDN"]}
   replicant_details = get_ldap_dn(master,'cn=mapping tree,cn=config',replicant_search)
 
-  # pp.pprint(replicant_details)
-
-  # dictionary containing the host name and connection object
+  # dictionary containing the infomration about the replicas we will connect to
+  # along with the connection object
   replicants={}
 
   for r in replicant_details:
@@ -114,21 +116,28 @@ def get_replication_data():
   ruv_search={"searchScope":ldap.SCOPE_SUBTREE, 
               "searchFilter":"(&(objectclass=nstombstone)(nsUniqueId=ffffffff-ffffffff-ffffffff-ffffffff))",
               "removeItems": ["nsDS5ReplicaCredentials","nsDS5ReplicaBindDN"]}
-              
+
+  # loop through each of the root DNs which are replicated              
   for replica_dn in cfg.replicaDNs:
     dn_result_set={}
+
+    # Get the RUV information for the source server
     dn_entry="cn=replica,cn=%s,cn=mapping tree,cn=config" %(escapeDNFiltValue(replica_dn))
     master_ruv_data=get_ldap_dn(master,replica_dn,ruv_search)
     dn_result_set['master_ruv']=master_ruv_data[dn_entry]
 
     dn_result_set['master_ruv']['nsState']=parse_nsstate(master_ruv_data[dn_entry]['nsState'])
 
-    master_ruv = RUV(master_ruv_data[dn_entry],limit_to_rid=master_ruv_data[dn_entry]['nsDS5ReplicaId'])
-    # master_ruv = RUV(master_ruv_data[dn_entry])
+    # Leaving this for now.  If limit_to_rid is passed in, only the RIDs which match
+    # the one passed in are stored in the final object.  Will likely require some
+    # rework to allow for finer grained testing
+    # master_ruv = RUV(master_ruv_data[dn_entry],limit_to_rid=master_ruv_data[dn_entry]['nsDS5ReplicaId'])
+    master_ruv = RUV(master_ruv_data[dn_entry])
 
     replicant_ruv = {}
     replicant_ruv_data={}
 
+    # Loop through the replicant servers and compare RUV information.
     for r in replicant_details:
       r_result_set={}
       r_details=replicant_details[r]
@@ -137,25 +146,17 @@ def get_replication_data():
       replicant_hostname=r_details["nsDS5ReplicaHost"]
       if replicant_connection:
         r_result_set=get_ldap_dn(replicant_connection,replica_dn,ruv_search)[dn_entry]
-        r_result_set['ruv']=RUV(r_result_set,limit_to_rid=master_ruv_data[dn_entry]['nsDS5ReplicaId'])
-        # r_result_set['ruv']=RUV(r_result_set)
-        # pp.pprint(r_result_set['ruv'])
-        r_result_set['nsState']=parse_nsstate(r_result_set['nsState'])
-        # replicant_ruv[replicant_hostname]=RUV(replicant_ruv_data[replicant_hostname])
-        # pp.pprint(replicant_ruv[replicant_hostname])
-        # print(r_result_set['ruv'])
 
-        # pp.pprint(master_ruv_data[dn_entry]["nsds50ruv"])
-        # for rid in master_ruv.rid:
-          # print("local ruv[%d]      %s" % (rid,master_ruv.rid[rid]))
-          # print("replicant ruv[%d]  %s" % (rid,r_result_set['ruv'].rid[rid]))
-          # print
-        # print("master maxcsn TS: %s" % (master_ruv.))
+        # Leaving this for now.  If limit_to_rid is passed in, only the RIDs which match
+        # the one passed in are stored in the final object.  Will likely require some
+        # rework to allow for finer grained testing
+        # r_result_set['ruv']=RUV(r_result_set,limit_to_rid=master_ruv_data[dn_entry]['nsDS5ReplicaId'])
+        r_result_set['ruv']=RUV(r_result_set)
+
+        r_result_set['nsState']=parse_nsstate(r_result_set['nsState'])
         rc,status = master_ruv.getdiffs(r_result_set['ruv'])
-        # print(status)
         r_result_set["ruv_equality"]=rc
         r_result_set["ruv_status"]=status
-        # print(rc)
         r_result_set["connect_status"]="Connection Good"
         r_result_set["status"]=r_details["status"]
         r_result_set["have_data"]=True
@@ -183,7 +184,6 @@ def get_replication_discovery():
         discovery_data["data"].append(disc_item)
   
   return discovery_data
-
 
 parser = argparse.ArgumentParser(description='Wrapper for Zabbix 2.4')
 parser.add_argument('-d',action='store_true', help='Show Discovery data')
