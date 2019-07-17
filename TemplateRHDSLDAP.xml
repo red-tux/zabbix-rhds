@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2019-07-17T14:13:17Z</date>
+    <date>2019-07-17T17:46:53Z</date>
     <groups>
         <group>
             <name>LDAP</name>
@@ -2443,7 +2443,7 @@
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
-                            <value_type>3</value_type>
+                            <value_type>0</value_type>
                             <allowed_hosts/>
                             <units/>
                             <snmpv3_contextname/>
@@ -2792,7 +2792,46 @@
                             </master_item>
                         </item_prototype>
                     </item_prototypes>
-                    <trigger_prototypes/>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Template RHDS LDAP:ldap.replication.have_data[{#ROOT},{#AGREEMENT}].str(true)}=0</expression>
+                            <recovery_mode>0</recovery_mode>
+                            <recovery_expression/>
+                            <name>No replication data for {HOST.NAME} ({#ROOT} - {#AGREEMENT})</name>
+                            <correlation_mode>0</correlation_mode>
+                            <correlation_tag/>
+                            <url/>
+                            <status>0</status>
+                            <priority>4</priority>
+                            <description/>
+                            <type>0</type>
+                            <manual_close>0</manual_close>
+                            <dependencies/>
+                            <tags/>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template RHDS LDAP:ldap.replication.ruv_status[{#ROOT},{#AGREEMENT}].str(up-to-date - RUVs are equal)}=0</expression>
+                            <recovery_mode>0</recovery_mode>
+                            <recovery_expression/>
+                            <name>Replication not in sync for {HOST.NAME} ({#ROOT} - {#AGREEMENT})</name>
+                            <correlation_mode>0</correlation_mode>
+                            <correlation_tag/>
+                            <url/>
+                            <status>0</status>
+                            <priority>4</priority>
+                            <description/>
+                            <type>0</type>
+                            <manual_close>0</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>No replication data for {HOST.NAME} ({#ROOT} - {#AGREEMENT})</name>
+                                    <expression>{Template RHDS LDAP:ldap.replication.have_data[{#ROOT},{#AGREEMENT}].str(true)}=0</expression>
+                                    <recovery_expression/>
+                                </dependency>
+                            </dependencies>
+                            <tags/>
+                        </trigger_prototype>
+                    </trigger_prototypes>
                     <graph_prototypes/>
                     <host_prototypes/>
                     <jmx_endpoint/>
