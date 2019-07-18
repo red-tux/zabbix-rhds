@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2019-07-18T14:52:38Z</date>
+    <date>2019-07-18T15:11:49Z</date>
     <groups>
         <group>
             <name>LDAP</name>
@@ -514,7 +514,7 @@
                     <status>0</status>
                     <value_type>3</value_type>
                     <allowed_hosts/>
-                    <units/>
+                    <units>B</units>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -639,7 +639,7 @@
                     <status>0</status>
                     <value_type>3</value_type>
                     <allowed_hosts/>
-                    <units>b</units>
+                    <units>B</units>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -655,7 +655,9 @@
                     <publickey/>
                     <privatekey/>
                     <port/>
-                    <description/>
+                    <description>The total size, in bytes, of DNs currently present in the DN cache.&#13;
+&#13;
+To increase the size of the entries which can be present in the DN cache, increase the value of the nsslapd-dncachememsize attribute in the cn=database_name, cn=ldbm database,cn=plugins,cn=config entry for the database.</description>
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
@@ -830,7 +832,7 @@
                     <status>0</status>
                     <value_type>3</value_type>
                     <allowed_hosts/>
-                    <units>b</units>
+                    <units>B</units>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -846,7 +848,9 @@
                     <publickey/>
                     <privatekey/>
                     <port/>
-                    <description/>
+                    <description>The total size, in bytes, of directory entries currently present in the entry cache.&#13;
+&#13;
+To increase the size of the entries which can be present in the cache, increase the value of the nsslapd-cachememsize attribute in the cn=database_name, cn=ldbm database,cn=plugins,cn=config entry for the database. In the Directory Server Console, this is set in the Memory available for cache field in the database settings.</description>
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
@@ -955,7 +959,7 @@
                     <status>0</status>
                     <value_type>3</value_type>
                     <allowed_hosts/>
-                    <units>b</units>
+                    <units>B</units>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -971,7 +975,9 @@
                     <publickey/>
                     <privatekey/>
                     <port/>
-                    <description/>
+                    <description>The maximum size, in bytes, of DNs that can be maintained in the DN cache.&#13;
+&#13;
+To increase the size of the entries which can be present in the cache, increase the value of the nsslapd-dncachememsize attribute in the cn=database_name, cn=ldbm database,cn=plugins,cn=config entry for the database.</description>
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
@@ -1021,7 +1027,7 @@
                     <status>0</status>
                     <value_type>3</value_type>
                     <allowed_hosts/>
-                    <units>b</units>
+                    <units>B</units>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -1037,7 +1043,9 @@
                     <publickey/>
                     <privatekey/>
                     <port/>
-                    <description/>
+                    <description>The maximum size, in bytes, of directory entries that can be maintained in the entry cache.&#13;
+&#13;
+To increase the size of the entries which can be present in the cache, increase the value of the nsslapd-cachememsize attribute in the cn=database_name, cn=ldbm database,cn=plugins,cn=config entry for the database. In the Directory Server Console, this is set in the Memory available for cache field in the database settings.</description>
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
@@ -3920,13 +3928,13 @@ Zabbix name does not contain &quot;rate&quot; as it is a cumulative counter, not
                     <snmp_community/>
                     <snmp_oid/>
                     <key>proc.mem[ns-slapd,,,,stk]</key>
-                    <delay>60s</delay>
+                    <delay>1m</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
                     <value_type>3</value_type>
                     <allowed_hosts/>
-                    <units>b</units>
+                    <units>B</units>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -4162,7 +4170,7 @@ Zabbix name does not contain &quot;rate&quot; as it is a cumulative counter, not
                     <status>0</status>
                     <value_type>3</value_type>
                     <allowed_hosts/>
-                    <units>b</units>
+                    <units>B</units>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
