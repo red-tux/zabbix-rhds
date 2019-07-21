@@ -134,6 +134,7 @@ def get_replication_data():
     # master_ruv = RUV(master_ruv_data[dn_entry],limit_to_rid=master_ruv_data[dn_entry]['nsDS5ReplicaId'])
     master_ruv = RUV(master_ruv_data[dn_entry])
 
+    dn_result_set['master_ruv']['ruv']=master_ruv
     replicant_ruv = {}
     replicant_ruv_data={}
 
@@ -197,4 +198,4 @@ except SystemExit as err:
 if args.d:
   print(json.dumps(get_replication_discovery(), indent=1))
 else:
-  print(json.dumps(get_replication_data(), indent=1, cls=ComplexEncoder))
+  print(json.dumps(get_replication_data(), indent=2, cls=ComplexEncoder))
