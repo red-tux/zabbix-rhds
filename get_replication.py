@@ -66,6 +66,7 @@ def parse_nsstate(nsstate):
 
   return return_val
 
+# TODO  Add nesting/reversing logic to dnd of 'for replica_dn' loop below
 def get_replication_data():
   master=connect(cfg.uri, cfg.username, cfg.password)
   result_set = {}
@@ -81,6 +82,7 @@ def get_replication_data():
   replicants={}
 
   for r in replicant_details:
+    print(replicant_details[r])
     r_values=replicant_details[r]
     r_data={}  # This will be appended to the replicant details at the end of the loop
     if r_values["nsDS5ReplicaTransportInfo"]=="LDAP":
@@ -96,7 +98,7 @@ def get_replication_data():
     except ldap.SERVER_DOWN:
       r_data['connection']=None
       r_data['connection_msg']="Unable to connect within timeout"
-    except ldap.INVALID_CREDENTIALS, e:
+    except ldap.INVALID_CREDENTIALS as e:
       r_data['connection']=None
       r_data['connection_msg']="Invalid login credentials"
 
@@ -105,7 +107,7 @@ def get_replication_data():
     # First split the string on cn=, trim the whitespace and remove the last character which will be a comma
     r_data['short_desc']=re.split("cn=",r)[1].strip()[:-1]
     r_data['status']={}
-    m = re.search('\((.+)\) (.*)',r_values['nsds5replicaLastUpdateStatus'])
+    m = re.search(r'\((.+)\) (.*)',r_values['nsds5replicaLastUpdateStatus'])
     if m:
       r_data['status']['errno']=m.group(1)
       r_data['status']['errstr']=m.group(2)
@@ -118,8 +120,14 @@ def get_replication_data():
               "removeItems": ["nsDS5ReplicaCredentials","nsDS5ReplicaBindDN"]}
 
   # loop through each of the root DNs which are replicated              
-  for replica_dn in cfg.replicaDNs:
+  for replica_dn_item in cfg.replicaDNs:
     dn_result_set={}
+    if isinstance(replica_dn_item,dict):
+      replica_dn=replica_dn_item.keys()[0]
+      replica_dn_label=replica_dn_item[replica_dn]['label']
+    else:
+      replica_dn=replica_dn_item
+      replica_dn_label=replica_dn
 
     # Get the RUV information for the source server
     dn_entry="cn=replica,cn=%s,cn=mapping tree,cn=config" %(escapeDNFiltValue(replica_dn))
@@ -168,7 +176,7 @@ def get_replication_data():
 
       dn_result_set[replicant_desc]=r_result_set
 
-    result_set[replica_dn]=dn_result_set
+    result_set[replica_dn_label]=dn_result_set
 
   return result_set
 
@@ -188,12 +196,19 @@ def get_replication_discovery():
 
 parser = argparse.ArgumentParser(description='Wrapper for Zabbix 2.4')
 parser.add_argument('-d',action='store_true', help='Show Discovery data')
+# parser.add_argument('-N',action='store_true', help='Use a Deeply nested prepresentation')
+# parser.add_argument('-r',action='store_true', help='Reverse the order of the deeply nested representation')
 
 try:
   args=parser.parse_args()
 except SystemExit as err:
   if err.code == 2: parser.print_help()
   sys.exit(err.code)
+
+# if args.r and not args.N:
+#   print("Reverse requires Deeply nested representation.")
+#   parser.print_help()
+#   sys.exit(1)
 
 if args.d:
   print(json.dumps(get_replication_discovery(), indent=1))
