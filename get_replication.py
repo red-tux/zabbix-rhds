@@ -67,7 +67,10 @@ def get_replication_data():
     # print(replicant_details[r])
     r_values=replicant_details[r]
     r_data={}  # This will be appended to the replicant details at the end of the loop
-    if r_values["nsDS5ReplicaTransportInfo"]=="LDAP":
+    # If attribute nsDS5ReplicaTransportInfo is not found, assume transport is ldap
+    if "nsDS5ReplicaTransportInfo" not in r_values:
+      transport="ldap"
+    elif r_values["nsDS5ReplicaTransportInfo"]=="LDAP":
       transport="ldap"
     elif r_values["nsDS5ReplicaTransportInfo"]=="SSL":
       transport="ldaps"
