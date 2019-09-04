@@ -231,8 +231,8 @@ if __name__ == "__main__":
     if args.f:
       result_list=[]
       for k in get_and_group(nested=False):
-        results[k]['dn']=k
-        result_list.append(results[k])
+        result_list[k]['dn']=k
+        result_list.append(result_list[k])
       print(json.dumps(result_list, indent=1))
     else:
       print(json.dumps(get_and_group(nested=args.N, reverse=args.r), indent=1))

@@ -48,24 +48,6 @@ def connect(uri, bind_dn, bind_password):
   l.result(result)  #Flush out errors if there are any
   return l
 
-def parse_nsstate(nsstate):
-  state=NSState(nsstate)
-  ts=int(state.sampled_time)
-  return_val={}
-  # JSON dumps does not like the raw nsstate string.  For now we don't store it
-  # TODO: Fix nsstate storage
-  # return_val['raw']=bytearray(nsstate).decode('utf-8')
-  return_val['sample_time']=str(datetime.datetime.fromtimestamp(ts))
-  return_val['tdiff']=state.tdiff
-  return_val['rid']=state.rid
-  return_val['seq_num']=state.seq_num
-  return_val['gen_csn']=state.gen_csn
-  return_val['local_offset']=state.local_offset
-  return_val['remote_offset']=state.remote_offset
-
-
-  return return_val
-
 # TODO  Add nesting/reversing logic to dnd of 'for replica_dn' loop below
 def get_replication_data():
   master=connect(cfg.uri, cfg.username, cfg.password)
@@ -82,7 +64,7 @@ def get_replication_data():
   replicants={}
 
   for r in replicant_details:
-    print(replicant_details[r])
+    # print(replicant_details[r])
     r_values=replicant_details[r]
     r_data={}  # This will be appended to the replicant details at the end of the loop
     if r_values["nsDS5ReplicaTransportInfo"]=="LDAP":
@@ -134,7 +116,7 @@ def get_replication_data():
     master_ruv_data=get_ldap_dn(master,replica_dn,ruv_search)
     dn_result_set['master_ruv']=master_ruv_data[dn_entry]
 
-    dn_result_set['master_ruv']['nsState']=parse_nsstate(master_ruv_data[dn_entry]['nsState'])
+    dn_result_set['master_ruv']['nsState']=NSState(master_ruv_data[dn_entry]['nsState'])
 
     # Leaving this for now.  If limit_to_rid is passed in, only the RIDs which match
     # the one passed in are stored in the final object.  Will likely require some
@@ -162,7 +144,7 @@ def get_replication_data():
         # r_result_set['ruv']=RUV(r_result_set,limit_to_rid=master_ruv_data[dn_entry]['nsDS5ReplicaId'])
         r_result_set['ruv']=RUV(r_result_set)
 
-        r_result_set['nsState']=parse_nsstate(r_result_set['nsState'])
+        r_result_set['nsState']=NSState(r_result_set['nsState'])
         rc,status = master_ruv.getdiffs(r_result_set['ruv'])
         r_result_set["ruv_equality"]=rc
         r_result_set["ruv_status"]=status
@@ -172,6 +154,9 @@ def get_replication_data():
       else:
         r_result_set["connect_status"]=replicant_details[r]['connection_msg']
         r_result_set["have_data"]=False
+
+      r_result_set["connected_to"]=replicant_hostname
+      r_result_set["description"]=replicant_desc
     
 
       dn_result_set[replicant_desc]=r_result_set
@@ -194,23 +179,24 @@ def get_replication_discovery():
   
   return discovery_data
 
-parser = argparse.ArgumentParser(description='Wrapper for Zabbix 2.4')
-parser.add_argument('-d',action='store_true', help='Show Discovery data')
-# parser.add_argument('-N',action='store_true', help='Use a Deeply nested prepresentation')
-# parser.add_argument('-r',action='store_true', help='Reverse the order of the deeply nested representation')
+if __name__ == "__main__":   
+  parser = argparse.ArgumentParser(description='Wrapper for Zabbix 2.4')
+  parser.add_argument('-d',action='store_true', help='Show Discovery data')
+  # parser.add_argument('-N',action='store_true', help='Use a Deeply nested prepresentation')
+  # parser.add_argument('-r',action='store_true', help='Reverse the order of the deeply nested representation')
 
-try:
-  args=parser.parse_args()
-except SystemExit as err:
-  if err.code == 2: parser.print_help()
-  sys.exit(err.code)
+  try:
+    args=parser.parse_args()
+  except SystemExit as err:
+    if err.code == 2: parser.print_help()
+    sys.exit(err.code)
 
-# if args.r and not args.N:
-#   print("Reverse requires Deeply nested representation.")
-#   parser.print_help()
-#   sys.exit(1)
+  # if args.r and not args.N:
+  #   print("Reverse requires Deeply nested representation.")
+  #   parser.print_help()
+  #   sys.exit(1)
 
-if args.d:
-  print(json.dumps(get_replication_discovery(), indent=1))
-else:
-  print(json.dumps(get_replication_data(), indent=2, cls=ComplexEncoder))
+  if args.d:
+    print(json.dumps(get_replication_discovery(), indent=1))
+  else:
+    print(json.dumps(get_replication_data(), indent=2, cls=ComplexEncoder))
