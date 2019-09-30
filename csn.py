@@ -29,7 +29,7 @@ class CSN(object):
       self.seq = 0
       self.rid = 0
       self.subseq = 0
-      print csnstr, "is not a valid CSN"
+      print(csnstr, "is not a valid CSN")
 
   def csndiff(self, oth):
     return (oth.ts - self.ts, oth.seq - self.seq, oth.rid - self.rid, oth.subseq - self.subseq)
@@ -78,12 +78,13 @@ class CSN(object):
 
   def reprJSON(self):
     return dict(time= time.strftime("%x %X", time.localtime(self.ts)),
+                ts= self.ts,
                 seq= self.seq,
                 rid= self.rid,
                 subseq= self.subseq)
 
   def __repr__(self):
-    return time.strftime("%x %X", time.localtime(self.ts)) + " seq: " + str(self.seq) + " rid: " + str(self.rid)
+    return time.strftime("%x %X", time.localtime(self.ts)) + " ts: " + str(self.ts) + " seq: " + str(self.seq) + " rid: " + str(self.rid)
 
   def __str__(self):
     return self.__repr__()

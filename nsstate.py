@@ -1,5 +1,6 @@
 import datetime
 import time
+import sys
 from struct import pack, unpack, calcsize
 
 
@@ -31,7 +32,7 @@ class NSState(object):
       # print "Big Endian"
       end = '>'
     else:
-      print "Unknown Endian"
+      print("Unknown Endian")
       sys.exit(-1) # blow up
     # print "For replica", dn
     thelen = len(nsstate)
@@ -61,11 +62,11 @@ class NSState(object):
     if wrongendian:
       # print "The difference in days is", tdiff/86400
       # print "This is probably the wrong bit-endianness - flipping"
-      end = flipend(end)
+      end = self.flipend(end)
       fmtstr = end + base_fmtstr
       (self.rid, self.sampled_time, self.local_offset, self.remote_offset, self.seq_num) = unpack(fmtstr, nsstate)
-      self.tdiff = now-sampled_time
-      self.tdelta = timedelta(seconds=self.tdiff) 
+      self.tdiff = now-self.sampled_time
+      self.tdelta = datetime.timedelta(seconds=self.tdiff)
     self.gen_csn= "%08x%04d%04d0000" % (self.sampled_time, self.seq_num, self.rid)
 
   def flipend(self,end):
@@ -78,3 +79,14 @@ class NSState(object):
     return "rid: " + str(self.rid) + " sampled_time: " + str(self.sampled_time) + \
            " seq_num: " + str(self.seq_num)
            #self.local_offset, self.remote_offset
+
+  def reprJSON(self):
+    return dict(rid= self.rid,
+                sampled_time= self.sampled_time,
+                sampled_time_conv=time.strftime("%x %X", time.localtime(self.sampled_time)),
+                local_offset= self.local_offset,
+                remote_offset= self.remote_offset,
+                seq_num= self.seq_num,
+                tdiff= self.tdiff,
+                tdelta= str(self.tdelta),
+                gen_csn= self.gen_csn)

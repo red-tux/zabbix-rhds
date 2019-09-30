@@ -68,7 +68,7 @@ class RUV(object):
                           'min': CSN(matchruv.group(3)),
                           'max': CSN(matchruv.group(4))}
       else:
-        print "unknown RUV element", item
+        print("unknown RUV element", item)
     for item in ent['nsruvReplicaLastModified']:
       matchruv = RUV.ruvre.match(item)
       if matchruv:
@@ -76,7 +76,7 @@ class RUV(object):
         if (limit_to_rid is None ) or (not limit_to_rid is None and limit_to_rid==rid):
           self.rid[rid]['lastmod'] = int(matchruv.group(3), 16)
       else:
-        print "unknown nsruvReplicaLastModified item", item
+        print("unknown nsruvReplicaLastModified item", item)
 
   def __cmp__(self, oth):
     if self is oth:
@@ -163,24 +163,24 @@ class RUV(object):
 
 
 
-  def getRUV(self, suffix, tryrepl=False, verbose=False):
-    uuid = "ffffffff-ffffffff-ffffffff-ffffffff"
-    filt = "(&(nsUniqueID=%s)(objectclass=nsTombstone))" % uuid
-    attrs = ['nsds50ruv', 'nsruvReplicaLastModified']
-    ents = self.search_s(suffix, ldap.SCOPE_SUBTREE, filt, attrs)
-    ent = None
-    if ents and (len(ents) > 0):
-      ent = ents[0]
-    elif tryrepl:
-      print "Could not get RUV from", suffix, "entry - trying cn=replica"
-      ensuffix = escapeDNValue(normalizeDN(suffix))
-      dn = ','.join("cn=replica,cn=%s" % ensuffix, DN_MAPPING_TREE)
-      ents = self.search_s(dn, ldap.SCOPE_BASE, "objectclass=*", attrs)
-    if ents and (len(ents) > 0):
-      ent = ents[0]
-    else:
-      print "Could not read RUV for", suffix
-      return None
-    if verbose:
-      print "RUV entry is", str(ent)
-    return RUV(ent)
+  # def getRUV(self, suffix, tryrepl=False, verbose=False):
+  #   uuid = "ffffffff-ffffffff-ffffffff-ffffffff"
+  #   filt = "(&(nsUniqueID=%s)(objectclass=nsTombstone))" % uuid
+  #   attrs = ['nsds50ruv', 'nsruvReplicaLastModified']
+  #   ents = self.search_s(suffix, ldap.SCOPE_SUBTREE, filt, attrs)
+  #   ent = None
+  #   if ents and (len(ents) > 0):
+  #     ent = ents[0]
+  #   elif tryrepl:
+  #     print("Could not get RUV from", suffix, "entry - trying cn=replica")
+  #     ensuffix = escapeDNValue(normalizeDN(suffix))
+  #     dn = ','.join("cn=replica,cn=%s" % ensuffix, DN_MAPPING_TREE)
+  #     ents = self.search_s(dn, ldap.SCOPE_BASE, "objectclass=*", attrs)
+  #   if ents and (len(ents) > 0):
+  #     ent = ents[0]
+  #   else:
+  #     print("Could not read RUV for", suffix)
+  #     return None
+  #   if verbose:
+  #     print("RUV entry is", str(ent))
+  #   return RUV(ent)

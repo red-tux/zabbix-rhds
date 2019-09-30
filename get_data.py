@@ -22,7 +22,37 @@ cfg = Struct(**settings)
 
 pp = pprint.PrettyPrinter(indent=2)
 
-def get_ldap_dn(connection, baseDN,dn_params):
+def build_nested_item(keys, data):
+  if len(keys)>1:
+    return {keys[0]:build_nested_item(keys[1:],data)}
+  else:
+    return {keys[0]:data}
+
+def mergedicts(dict1, dict2):
+  for k in set(dict1.keys()).union(dict2.keys()):
+    if k in dict1 and k in dict2:
+      if isinstance(dict1[k], dict) and isinstance(dict2[k], dict):
+        yield (k, dict(mergedicts(dict1[k], dict2[k])))
+      else:
+        # If one of the values is not a dict, you can't continue merging it.
+        # Value from second dict overrides one in first and we move on.
+        yield (k, dict2[k])
+        # Alternatively, replace this with exception raiser to alert you of value conflicts
+    elif k in dict1:
+      yield (k, dict1[k])
+    else:
+      yield (k, dict2[k])
+
+def deeply_nest(data,reverse=False):
+  return_dict={}
+  for k in data:
+    keys=k.split(',')
+    if reverse:
+      keys=keys[::-1]
+    return_dict=dict(mergedicts(return_dict,build_nested_item(keys,data[k])))
+  return return_dict
+
+def get_ldap_dn(connection, baseDN,dn_params, ):
   searchScope=dn_params.get("searchScope",ldap.SCOPE_SUBTREE)
   searchFilter=dn_params["searchFilter"]
   retrieveAttributes=dn_params.get("retrieveAttributes")
@@ -47,11 +77,11 @@ def get_ldap_dn(connection, baseDN,dn_params):
         val.pop('objectClass',None)
         val.pop('cn',None)
         result_set[dn]=val
-  except ldap.INVALID_CREDENTIALS, e:
-    print "Invalid login credentials given"
+  except ldap.INVALID_CREDENTIALS as e:
+    print("Invalid login credentials given")
     sys.exit(1)
-  except ldap.LDAPError, e:
-    print e
+  except ldap.LDAPError as e:
+    print(e)
     raise
 
   return result_set
@@ -69,11 +99,11 @@ def get_ldap_data(dns = cfg.DNs):
 
     for dn in dns:
       result_set.update(get_ldap_dn(l,dn,dns[dn]))
-  except ldap.INVALID_CREDENTIALS, e:
-    print "Invalid login credentials given"
+  except ldap.INVALID_CREDENTIALS as e:
+    print( "Invalid login credentials given")
     sys.exit(1)
-  except ldap.LDAPError, e:
-    print e
+  except ldap.LDAPError as e:
+    print(e)
     raise
 
   now=datetime.datetime.now(tzlocal())
@@ -114,13 +144,16 @@ def group_dbordinals(entry):
     entry["db"]=dbitems
   return entry
 
-def get_and_group(flat=False):
+def get_and_group(nested=False, reverse=False):
   result_set=get_ldap_data()
   for k in result_set:
     result_set[k]=group_dbordinals(result_set[k])
-  return result_set
+  if nested:
+    return deeply_nest(result_set,reverse=reverse)
+  else:
+    return result_set
 
-def get_discovery():
+def get_discovery(deeply_nested=False, reverse=False):
   result_set={"data":[]}
 
   # Setup an ldap query to get cn=monitor to find out all the database back ends
@@ -147,13 +180,23 @@ def get_discovery():
   
   # loop through the backends and build the discovery macros
   for dn in backend_dns:
+    # first split the dn into its component parts
+    if deeply_nested:
+      dn_list=dn.split(',')
+      if reverse:
+        # Reverse the order if needed
+        dn_list=dn_list[::-1]
+      base_dn="']['".join(dn_list)
+    else:
+      base_dn=dn
     for k,v in data_set[dn]["db"].items():
       r=sub_name_regex.match(k)
       dbfile=r.group(1)
       group=re.sub("/%s" % (dbfile),"", k)
 
       #BASEJSON macro makes it easier to directly reference this backend.
-      base_json="['%s'].db['%s']" % (dn, k)
+ 
+      base_json="['%s']['db']['%s']" % (base_dn, k)
       i = {"{#DBNAME}": k, 
            "{#DBGROUP}":group,
            "{#DBFILE}": dbfile,
@@ -163,10 +206,13 @@ def get_discovery():
 
   return result_set
 
+
+
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Wrapper for Zabbix 2.4')
   parser.add_argument('-d',action='store_true', help='Show Discovery data')
-  parser.add_argument('-f',action='store_true', help='Use a flat data representation')
+  parser.add_argument('-N',action='store_true', help='Use a Deeply nested prepresentation')
+  parser.add_argument('-r',action='store_true', help='Reverse the order of the deeply nested representation')
 
   try:
     args=parser.parse_args()
@@ -174,8 +220,20 @@ if __name__ == "__main__":
     if err.code == 2: parser.print_help()
     sys.exit(err.code)
 
+  if args.r and not args.N:
+    print("Reverse requires Deeply nested representation.")
+    parser.print_help()
+    sys.exit(1)
+
   if args.d:
-    print(json.dumps(get_discovery(), indent=1))
+    print(json.dumps(get_discovery(deeply_nested=args.N,reverse=args.r), indent=1))
   else:
-    print(json.dumps(get_and_group(args.f), indent=1))
+    if args.f:
+      result_list=[]
+      for k in get_and_group(nested=False):
+        result_list[k]['dn']=k
+        result_list.append(result_list[k])
+      print(json.dumps(result_list, indent=1))
+    else:
+      print(json.dumps(get_and_group(nested=args.N, reverse=args.r), indent=1))
 
