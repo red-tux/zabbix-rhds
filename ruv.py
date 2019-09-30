@@ -1,8 +1,11 @@
 import re
 import ldap
 import json
+import pprint
 
 from csn import *
+
+pp = pprint.PrettyPrinter(indent=2)
 
 def normalizeDN(dn, usespace=False):
   # not great, but will do until we use a newer version of python-ldap
@@ -121,23 +124,44 @@ class RUV(object):
       return (1, "second RUV is empty")
     diff = cmp(self.gen, oth.gen)
     if diff:
-      return (diff, "generation [" + str(self.gen) + "] not equal to [" + str(oth.gen) + "]: likely not yet initialized")
-    retstr = ''
+      return (diff, ["generation [" + str(self.gen) + "] not equal to [" + str(oth.gen) + "]: likely not yet initialized"])
+    retstrs = []
     for rid in self.rid.keys():
       for item in ('max', 'min'):
         csn = self.rid[rid][item]
         csnoth = oth.rid[rid][item]
         csndiff = cmp(csn, csnoth)
         if csndiff:
-          if len(retstr):
-            retstr += "\n"
-          retstr += "rid %d %scsn %s\n\t[%s] vs [%s]" % (rid, item, csn.diff2str(csnoth),
-                                                            csn, csnoth)
+          retstrs.append("rid %d %scsn %s  [%s] vs [%s]" % (rid, item, csn.diff2str(csnoth),csn, csnoth))
           if not diff:
             diff = csndiff
     if not diff:
-      retstr = "up-to-date - RUVs are equal"
-    return (diff, retstr)
+      retstrs = ["up-to-date - RUVs are equal"]
+    return (diff, retstrs)
+  
+  def getdiffs2(self, oth):
+    results={}
+    for rid_num in self.rid.keys():
+      if not rid_num in results:
+        results[rid_num]={}
+      for s in ('min', 'max'):
+        csn = self.rid[rid_num][s]
+        csnoth = oth.rid[rid_num][s]
+        csndiff = cmp(csn, csnoth)
+        if csndiff:
+          csn_str="%s  [%s] vs [%s]" % (csn.diff2str(csnoth),csn, csnoth)
+        else:
+          csn_str="equal"
+        item = s+"csn_diffstr"
+        results[rid_num][item]=csn_str
+        item = s+"csn_timediff"
+        results[rid_num][item] = csn.timediff(csnoth)
+        item = s+"csn_seqdiff"
+        results[rid_num][item] = csn.seqdiff(csnoth)
+        results[rid_num]['url'] = self.rid[rid_num]['url']
+    return results
+
+
 
   def getRUV(self, suffix, tryrepl=False, verbose=False):
     uuid = "ffffffff-ffffffff-ffffffff-ffffffff"

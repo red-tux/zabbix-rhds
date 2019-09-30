@@ -82,6 +82,7 @@ def get_ldap_data(dns = cfg.DNs):
     "DNs":cfg.DNs,
     "timeStamp":now.strftime("%Y-%m-%d %H:%M:%S %Z")
   }
+  pp.pprint(result_set)
   return result_set
 
 def group_dbordinals(entry):
@@ -113,7 +114,7 @@ def group_dbordinals(entry):
     entry["db"]=dbitems
   return entry
 
-def get_and_group():
+def get_and_group(flat=False):
   result_set=get_ldap_data()
   for k in result_set:
     result_set[k]=group_dbordinals(result_set[k])
@@ -165,6 +166,7 @@ def get_discovery():
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Wrapper for Zabbix 2.4')
   parser.add_argument('-d',action='store_true', help='Show Discovery data')
+  parser.add_argument('-f',action='store_true', help='Use a flat data representation')
 
   try:
     args=parser.parse_args()
@@ -175,5 +177,5 @@ if __name__ == "__main__":
   if args.d:
     print(json.dumps(get_discovery(), indent=1))
   else:
-    print(json.dumps(get_and_group(), indent=1))
+    print(json.dumps(get_and_group(args.f), indent=1))
 

@@ -55,10 +55,10 @@ class CSN(object):
     diff = oth.ts - self.ts
     if diff > 0:
       td = datetime.timedelta(seconds=diff)
-      retstr = "is behind by %s" % td
+      retstr = "behind by %s" % td
     elif diff < 0:
       td = datetime.timedelta(seconds=-diff)
-      retstr = "is ahead by %s" % td
+      retstr = "ahead by %s" % td
     else:
       diff = oth.seq - self.seq
       if diff:
@@ -68,6 +68,13 @@ class CSN(object):
       else:
         retstr = "equal"
     return retstr
+
+  def timediff(self,oth):
+    diff = oth.ts - self.ts
+    return diff
+
+  def seqdiff(self,oth):
+    return oth.seq-self.seq
 
   def reprJSON(self):
     return dict(time= time.strftime("%x %X", time.localtime(self.ts)),

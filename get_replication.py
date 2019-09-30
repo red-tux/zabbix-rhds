@@ -158,6 +158,7 @@ def get_replication_data():
         rc,status = master_ruv.getdiffs(r_result_set['ruv'])
         r_result_set["ruv_equality"]=rc
         r_result_set["ruv_status"]=status
+        r_result_set["rid_diffs"]=master_ruv.getdiffs2(r_result_set['ruv'])
         r_result_set["connect_status"]="Connection Good"
         r_result_set["status"]=r_details["status"]
         r_result_set["have_data"]=True
