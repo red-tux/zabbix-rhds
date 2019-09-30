@@ -211,6 +211,7 @@ def get_discovery(deeply_nested=False, reverse=False):
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Wrapper for Zabbix 2.4')
   parser.add_argument('-d',action='store_true', help='Show Discovery data')
+  parser.add_argument('-f',action='store_true', help='Use a flat data representation')
   parser.add_argument('-N',action='store_true', help='Use a Deeply nested prepresentation')
   parser.add_argument('-r',action='store_true', help='Reverse the order of the deeply nested representation')
 
