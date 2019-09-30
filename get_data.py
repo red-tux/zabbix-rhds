@@ -45,10 +45,8 @@ def mergedicts(dict1, dict2):
 
 def deeply_nest(data,reverse=False):
   return_dict={}
-  print("deeply_nest")
   for k in data:
     keys=k.split(',')
-    print(keys)
     if reverse:
       keys=keys[::-1]
     return_dict=dict(mergedicts(return_dict,build_nested_item(keys,data[k])))
