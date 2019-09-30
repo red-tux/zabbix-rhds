@@ -45,8 +45,10 @@ def mergedicts(dict1, dict2):
 
 def deeply_nest(data,reverse=False):
   return_dict={}
+  print("deeply_nest")
   for k in data:
     keys=k.split(',')
+    print(keys)
     if reverse:
       keys=keys[::-1]
     return_dict=dict(mergedicts(return_dict,build_nested_item(keys,data[k])))
@@ -112,7 +114,6 @@ def get_ldap_data(dns = cfg.DNs):
     "DNs":cfg.DNs,
     "timeStamp":now.strftime("%Y-%m-%d %H:%M:%S %Z")
   }
-  pp.pprint(result_set)
   return result_set
 
 def group_dbordinals(entry):
