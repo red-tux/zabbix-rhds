@@ -4,13 +4,12 @@ from os import path
 import ldap3
 import json
 import pprint
-import ldap
 import sys
 import re
 import datetime
 import yaml
 import argparse
-from dateutil.tz import tzlocal
+# from dateutil.tz import tzlocal
 
 pp=pprint.PrettyPrinter(indent=2)
 
@@ -69,7 +68,7 @@ class RHDS_Server():
                                 attributes="*")
       for entry in self.ldap_conn.response:
         attr = entry['attributes']
-        remove_keys=['aci','objectClass']
+        remove_keys=['aci','objectClass','cn']
         if 'removeItems' in self.monitorDNs[dn].keys():
           remove_keys = remove_keys + self.monitorDNs[dn]['removeItems']
         for key in remove_keys:
