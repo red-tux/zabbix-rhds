@@ -183,15 +183,19 @@ monitor:
     opsinitiated:
       value_type: 3
       history: 30d
+      _change: sec
     opscompleted:
       value_type: 3
       history: 30d
+      _change: sec
     entriessent:
       value_type: 3
       history: 30d
+      _change: sec
     bytessent:
       value_type: 3
       history: 30d
+      _change: sec
     currenttime:
       value_type: 3
       history: 30d
@@ -208,51 +212,66 @@ monitor.snmp:
     anonymousbinds:
       value_type: 3
       history: 30d
+      _change: sec
     unauthbinds:
       value_type: 3
       history: 30d
+      _change: sec
     simpleauthbinds:
       value_type: 3
       history: 30d
+      _change: sec
     strongauthbinds:
       value_type: 3
       history: 30d
+      _change: sec
     bindsecurityerrors:
       value_type: 3
       history: 30d
     inops:
       value_type: 3
       history: 30d
+      _change: sec
     readops:
       value_type: 3
       history: 30d
+      _change: sec
     compareops:
       value_type: 3
       history: 30d
+      _change_sec: true
     addentryops:
       value_type: 3
       history: 30d
+      _change: sec
     removeentryops:
       value_type: 3
       history: 30d
+      _change: sec
     modifyentryops:
       value_type: 3
       history: 30d
+      _change: sec
     modifyrdnops:
       value_type: 3
       history: 30d
+      _change: sec
     listops:
       value_type: 3
       history: 30d
+      _change: sec
     searchops:
       value_type: 3
       history: 30d
+      _change: sec
     onelevelsearchops:
       value_type: 3
       history: 30d
+      _change: sec
     wholesubtreesearchops:
       value_type: 3
       history: 30d
+      _change: sec
     referrals:
       value_type: 3
       history: 30d
@@ -280,12 +299,15 @@ monitor.snmp:
     bytesrecv:
       value_type: 3
       history: 30d
+      _change: sec
     bytessent:
       value_type: 3
       history: 30d
+      _change: sec
     entriesreturned:
       value_type: 3
       history: 30d
+      _change: sec
     referralsreturned:
       value_type: 3
       history: 30d
