@@ -429,6 +429,6 @@ config.plugins.ldbmdatabase.monitor.database:
     nsslapd-db-pages-in-use:
       value_type: 3
       history: 30d
-    nsslapd-db-txn-region-wait-rat:
+    nsslapd-db-txn-region-wait-rate:
       value_type: 3
       history: 30d

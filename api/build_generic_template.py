@@ -7,8 +7,13 @@ import argparse
 
 pp = pprint.PrettyPrinter(indent=2)
 
-base_path=path.dirname(path.abspath(__file__))
-api_info=yaml.load(open(base_path+"/api.yaml"), yaml.Loader)
+class Template:
+  def load(self,yaml_file):
+    base_path=path.dirname(path.abspath(__file__))
+    indata=yaml.load(open(base_path+yaml_file), yaml.Loader)
+
+    self.name = indata['template_name']
+    
 
 def create_json_dependent(host,parent,name,key,preprocessing=[],applications=[],history='1d',value_type=3):
   item_val = zapi.item.get(hostids=host,sortfield="key_",output="extend",search={"key_":key})
@@ -34,14 +39,19 @@ def create_key(host,name,key):
  
  
 parser = argparse.ArgumentParser(description='Zabbix API Templatecreator script')
-parser.add_argument('-s',dest='server',type=str, 
+parser.add_argument('template', type=str,
+                    help="Template to process")
+parser.add_argument('-s',dest='server',type=str, required=True,
                     help='Server to connect to')
-parser.add_argument('-u',dest='user',type=str, 
+parser.add_argument('-u',dest='user',type=str, required=True,
                     help='User to use')
-parser.add_argument('-p',dest='passwd',type=str, 
+parser.add_argument('-p',dest='passwd',type=str, required=True,
                     help='User password')
 
 args = parser.parse_args()
+
+base_path=path.dirname(path.abspath(__file__))
+api_info=yaml.load(open(base_path+args.template), yaml.Loader)
 
 # Create ZabbixAPI class instance
 zapi = ZabbixAPI(url=args.server, user=args.user, password=args.passwd)

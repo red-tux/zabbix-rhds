@@ -1,0 +1,447 @@
+---
+template_name: IdM server monitoring
+monitor_items:
+  dirsrv.zabbix_monitor:
+    name: LDAP 
+  config.plugins.ldbmdatabase.monitor:
+    parent: dirsrv.zabbix_monitor
+    frequency: 5m
+    dn: "cn=monitor,cn=ldbm database,cn=plugins,cn=config"
+    name_formatter: "ldbm database {}"
+    items:
+      dbcachehits:
+        value_type: 3
+        history: 30d
+      dbcachetries:
+        value_type: 3
+        history: 30d
+      dbcachehitratio:
+        value_type: 3
+        history: 30d
+      dbcachepagein:
+        value_type: 3
+        history: 30d
+      dbcachepageout:
+        value_type: 3
+        history: 30d
+      dbcacheroevict:
+        value_type: 3
+        history: 30d
+      dbcacherwevict:
+        value_type: 3
+        history: 30d
+      normalizeddncachetries:
+        value_type: 3
+        history: 30d
+      normalizeddncachehits:
+        value_type: 3
+        history: 30d
+      normalizeddncachemisses:
+        value_type: 3
+        history: 30d
+      normalizeddncachehitratio:
+        value_type: 3
+        history: 30d
+      normalizeddncacheevictions:
+        value_type: 3
+        history: 30d
+      currentnormalizeddncachesize:
+        value_type: 3
+        history: 30d
+      maxnormalizeddncachesize:
+        value_type: 3
+        history: 30d
+      normalizeddncachethreadsize:
+        value_type: 3
+        history: 30d
+      normalizeddncachethreadslots:
+        value_type: 3
+        history: 30d
+      currentnormalizeddncachecount:
+        value_type: 3
+        history: 30d
+  config.plugins.ldbmdatabase.changelog.monitor:
+    parent: dirsrv.zabbix_monitor
+    frequency: 5m
+    dn: "cn=monitor,cn=changelog,cn=ldbm database,cn=plugins,cn=config"
+    items:
+      readonly:
+        value_type: 3
+        history: 30d
+      entrycachehits:
+        value_type: 3
+        history: 30d
+      entrycachetries:
+        value_type: 3
+        history: 30d
+      entrycachehitratio:
+        value_type: 3
+        history: 30d
+      currententrycachesize:
+        value_type: 3
+        history: 30d
+      maxentrycachesize:
+        value_type: 3
+        history: 30d
+      currententrycachecount:
+        value_type: 3
+        history: 30d
+      maxentrycachecount:
+        value_type: 3
+        history: 30d
+      dncachehits:
+        value_type: 3
+        history: 30d
+      dncachetries:
+        value_type: 3
+        history: 30d
+      dncachehitratio:
+        value_type: 3
+        history: 30d
+      currentdncachesize:
+        value_type: 3
+        history: 30d
+      maxdncachesize:
+        value_type: 3
+        history: 30d
+      currentdncachecount:
+        value_type: 3
+        history: 30d
+      maxdncachecount:
+        value_type: 3
+        history: 30d
+  config.plugins.ldbmdatabase.userroot.monitor:
+    parent: dirsrv.zabbix_monitor
+    frequency: 5m
+    dn: "cn=monitor,cn=userRoot,cn=ldbm database,cn=plugins,cn=config"
+    items:
+      readonly:
+        value_type: 3
+        history: 30d
+      entrycachehits:
+        value_type: 3
+        history: 30d
+      entrycachetries:
+        value_type: 3
+        history: 30d
+      entrycachehitratio:
+        value_type: 3
+        history: 30d
+      currententrycachesize:
+        value_type: 3
+        history: 30d
+      maxentrycachesize:
+        value_type: 3
+        history: 30d
+      currententrycachecount:
+        value_type: 3
+        history: 30d
+      maxentrycachecount:
+        value_type: 3
+        history: 30d
+      dncachehits:
+        value_type: 3
+        history: 30d
+      dncachetries:
+        value_type: 3
+        history: 30d
+      dncachehitratio:
+        value_type: 3
+        history: 30d
+      currentdncachesize:
+        value_type: 3
+        history: 30d
+      maxdncachesize:
+        value_type: 3
+        history: 30d
+      currentdncachecount:
+        value_type: 3
+        history: 30d
+      maxdncachecount:
+        value_type: 3
+        history: 30d
+  monitor:
+    dn: "cn=monitor"
+    frequency: 5m
+    parent: dirsrv.zabbix_monitor
+    items:  
+      version:
+        value_type: 4
+        history: 30d
+      threads:
+        value_type: 3
+        history: 30d
+      currentconnections:
+        value_type: 3
+        history: 30d
+      totalconnections:
+        value_type: 3
+        history: 30d
+      currentconnectionsatmaxthreads:
+        value_type: 3
+        history: 30d
+      maxthreadsperconnhits:
+        value_type: 3
+        history: 30d
+      dtablesize :
+        value_type: 3
+        history: 30d
+      readwaiters:
+        value_type: 3
+        history: 30d
+      opsinitiated:
+        value_type: 3
+        history: 30d
+        _change: sec
+      opscompleted:
+        value_type: 3
+        history: 30d
+        _change: sec
+      entriessent:
+        value_type: 3
+        history: 30d
+        _change: sec
+      bytessent:
+        value_type: 3
+        history: 30d
+        _change: sec
+      currenttime:
+        value_type: 3
+        history: 30d
+      starttime:
+        value_type: 3
+        history: 30d
+      nbackends:
+        value_type: 3
+        history: 30d
+  monitor.snmp:
+    dn: "cn=snmp,cn=monitor"
+    frequency: 5m
+    parent: dirsrv.zabbix_monitor
+    items:
+      anonymousbinds:
+        value_type: 3
+        history: 30d
+        _change: sec
+      unauthbinds:
+        value_type: 3
+        history: 30d
+        _change: sec
+      simpleauthbinds:
+        value_type: 3
+        history: 30d
+        _change: sec
+      strongauthbinds:
+        value_type: 3
+        history: 30d
+        _change: sec
+      bindsecurityerrors:
+        value_type: 3
+        history: 30d
+      inops:
+        value_type: 3
+        history: 30d
+        _change: sec
+      readops:
+        value_type: 3
+        history: 30d
+        _change: sec
+      compareops:
+        value_type: 3
+        history: 30d
+        _change_sec: true
+      addentryops:
+        value_type: 3
+        history: 30d
+        _change: sec
+      removeentryops:
+        value_type: 3
+        history: 30d
+        _change: sec
+      modifyentryops:
+        value_type: 3
+        history: 30d
+        _change: sec
+      modifyrdnops:
+        value_type: 3
+        history: 30d
+        _change: sec
+      listops:
+        value_type: 3
+        history: 30d
+        _change: sec
+      searchops:
+        value_type: 3
+        history: 30d
+        _change: sec
+      onelevelsearchops:
+        value_type: 3
+        history: 30d
+        _change: sec
+      wholesubtreesearchops:
+        value_type: 3
+        history: 30d
+        _change: sec
+      referrals:
+        value_type: 3
+        history: 30d
+      chainings:
+        value_type: 3
+        history: 30d
+      securityerrors:
+        value_type: 3
+        history: 30d
+      errors:
+        value_type: 3
+        history: 30d
+      connections:
+        value_type: 3
+        history: 30d
+      connectionseq:
+        value_type: 3
+        history: 30d
+      connectionsinmaxthreads:
+        value_type: 3
+        history: 30d
+      connectionsmaxthreadscount:
+        value_type: 3
+        history: 30d
+      bytesrecv:
+        value_type: 3
+        history: 30d
+        _change: sec
+      bytessent:
+        value_type: 3
+        history: 30d
+        _change: sec
+      entriesreturned:
+        value_type: 3
+        history: 30d
+        _change: sec
+      referralsreturned:
+        value_type: 3
+        history: 30d
+      masterentries:
+        value_type: 3
+        history: 30d
+      copyentries:
+        value_type: 3
+        history: 30d
+      cacheentries:
+        value_type: 3
+        history: 30d
+      cachehits:
+        value_type: 3
+        history: 30d
+      slavehit:
+        value_type: 3
+        history: 30d
+  config.plugins.ldbmdatabase.monitor.database:
+    dn: "cn=database,cn=monitor,cn=ldbm database,cn=plugins,cn=config"
+    frequency: 5m
+    parent: dirsrv.zabbix_monitor
+    items:
+      nsslapd-db-abort-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-active-txns:
+        value_type: 3
+        history: 30d
+      nsslapd-db-cache-hit:
+        value_type: 3
+        history: 30d
+      nsslapd-db-cache-try:
+        value_type: 3
+        history: 30d
+      nsslapd-db-cache-region-wait-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-cache-size-bytes:
+        value_type: 3
+        history: 30d
+      nsslapd-db-clean-pages:
+        value_type: 3
+        history: 30d
+      nsslapd-db-commit-rate :
+        value_type: 3
+        history: 30d
+      nsslapd-db-deadlock-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-dirty-pages:
+        value_type: 3
+        history: 30d
+      nsslapd-db-hash-buckets:
+        value_type: 3
+        history: 30d
+      nsslapd-db-hash-elements-examine-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-hash-search-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-lock-conflicts:
+        _frequency: 1m
+        value_type: 3
+        history: 30d
+      nsslapd-db-lock-region-wait-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-lock-request-rate:
+        value_type: 3
+        history: 30d
+        _change: sec
+      nsslapd-db-lockers:
+        value_type: 3
+        history: 30d
+      nsslapd-db-configured-locks:
+        value_type: 3
+        history: 30d
+      nsslapd-db-current-locks:
+        value_type: 3
+        history: 30d
+      nsslapd-db-max-locks:
+        value_type: 3
+        history: 30d
+      nsslapd-db-current-lock-objects:
+        value_type: 3
+        history: 30d
+      nsslapd-db-max-lock-objects:
+        value_type: 3
+        history: 30d
+      nsslapd-db-log-bytes-since-checkpoint:
+        value_type: 3
+        history: 30d
+      nsslapd-db-log-region-wait-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-log-write-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-longest-chain-length:
+        value_type: 3
+        history: 30d
+      nsslapd-db-page-create-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-page-read-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-page-ro-evict-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-page-rw-evict-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-page-trickle-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-page-write-rate:
+        value_type: 3
+        history: 30d
+      nsslapd-db-pages-in-use:
+        value_type: 3
+        history: 30d
+      nsslapd-db-txn-region-wait-rate:
+        value_type: 3
+        history: 30d
