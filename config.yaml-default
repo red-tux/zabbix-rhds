@@ -26,21 +26,22 @@ DNs:
   cn=config:
     searchScope: 2
     retrieveAttributes: 
-    searchFilter: '(|(cn=features)(cn=monitor)(cn=snmp)(cn=replication))'
+    searchFilter: '(|(cn=monitor))'
   cn=monitor:
     searchScope: 2
     retrieveAttributes: 
-    searchFilter: ObjectClass=*
+    searchFilter: (ObjectClass=*)
   cn=mapping tree, cn=config:
     searchScope: 2
     retrieveAttributes: 
-    searchFilter: ObjectClass=*
+    searchFilter: (ObjectClass=*)
     removeItems:
       - nsState
       - nsDS5ReplicaCredentials
+      - nsDS5ReplicaBindDN
   cn=database, cn=monitor, cn=ldbm database, cn=plugins, cn=config:
     searchScope: 2
     retrieveAttributes:
-    searchFilter: ObjectClass=*      
+    searchFilter: (ObjectClass=*)
 
         

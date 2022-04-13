@@ -1,0 +1,23 @@
+dn: cn=config
+changetype: modify
+add: aci
+aci: (targetattr = "*")(targetfilter = (cn=monitor))
+ (version 3.0; acl "Allow monitor to all of cn=monitor under cn=config";
+ allow (read,search)
+ userdn = "ldap:///uid=ZabbixMonitor,ou=applications,dc=example,dc=com";)
+
+dn: cn=mapping tree,cn=config
+changetype: modify
+add: aci
+aci: (targetattr != "nsState || nsDS5ReplicaCredentials || nsDS5ReplicaBindDN ")
+ (version 3.0; acl "Allow monitor to all of cn=mapping tree,cn=config except credentials";
+ allow (read, search)
+ userdn="ldap:///uid=ZabbixMonitor,ou=applications,dc=example,dc=com";)
+
+dn: cn=database,cn=monitor,cn=ldbm database,cn=plugins,cn=config
+changetype: modify
+add: aci
+aci: (targetattr= "*")
+ (version 3.0; acl "Allow monitor to all of cn=mapping tree,cn=config";
+ allow (read, search) 
+ userdn="ldap:///uid=ZabbixMonitor,ou=applications,dc=example,dc=com";)
